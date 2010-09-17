@@ -65,7 +65,7 @@ public abstract class GameApplication {
 	private GraphicsEnvironment ge;
 	private final JFrame frame = new JFrame();
 	private final InnerPainter panel = new InnerPainter(this);
-	private final InnerEventPump pump = new InnerEventPump(this);
+	private final InnerEventPump pump = new InnerEventPump(this, Thread.currentThread());
 	private final Thread painterThread;
 	private final Thread pumpThread;
 	private final Image buffer;
@@ -131,12 +131,6 @@ public abstract class GameApplication {
 				}
 			}
 		}
-
-		// Call init before we pack the frame
-		// so that any changes (title, etc)
-		// will be reflected properly.
-
-		init();
 
 		frame.pack();
 		frame.setVisible(true);
@@ -204,15 +198,6 @@ public abstract class GameApplication {
 	* @param c the character represented by the key
 	**/
 	protected void keyTyped(char c) {}
-
-
-	/**
-	* The init method will be called before
-	* game event pumps are initialized, and is the
-	* safe place to do any setup before the first
-	* frame of the game is rendered.
-	**/
-	protected void init() {}
 
 	/**
 	* A game's rendering code should go here.
@@ -322,14 +307,20 @@ public abstract class GameApplication {
 
 	private class InnerEventPump implements Runnable {
 		private final GameApplication app;
+		private final Thread parent;
 		private boolean running = true;
 		private long lastTick = System.nanoTime();
 
-		public InnerEventPump(GameApplication app) {
+		public InnerEventPump(GameApplication app, Thread parent) {
 			this.app = app;
+			this.parent = parent;
 		}
 
 		public void run() {
+			try {
+				parent.join();
+			}
+			catch(InterruptedException ie) { ie.printStackTrace(); }
 			while(running) {
 				long thisTick = System.nanoTime();
 				double tickTime = ((double)( (thisTick - lastTick) / 1000000)) / 1024;
