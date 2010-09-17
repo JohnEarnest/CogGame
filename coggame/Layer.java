@@ -12,19 +12,19 @@ import java.awt.Graphics;
 **/
 public abstract class Layer {
 	
-	private int x = 0;
-	private int y = 0;
+	private double x = 0;
+	private double y = 0;
 	private boolean visible = true;
 
 	/**
 	* Returns the x-position of the Layer.
 	**/
-	public int getX() { return x; }
+	public int getX() { return (int) x; }
 
 	/**
 	* Returns the y-position of the Layer.
 	**/
-	public int getY() { return y; }
+	public int getY() { return (int) y; }
 
 	/**
 	* Returns true if the Layer is visible.
@@ -45,7 +45,7 @@ public abstract class Layer {
 	* @param dx the x-displacement in pixels
 	* @param dy the y-displacement in pixels
 	**/
-	public void move(int dx, int dy) { x += dx; y += dy; }
+	public void move(double dx, double dy) { x += dx; y += dy; }
 
 	/**
 	* Set the absolute position of the Layer.
@@ -53,7 +53,7 @@ public abstract class Layer {
 	* @param px the x-position in pixels
 	* @param py the y-position in pixels
 	**/
-	public void setPosition(int px, int py) { x = px; y = py; }
+	public void setPosition(double px, double py) { x = px; y = py; }
 
 	/**
 	* Returns the width of the Layer in pixels.

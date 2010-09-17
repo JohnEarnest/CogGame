@@ -128,8 +128,6 @@ public class LayerManager {
 		public final Layer layer;
 		private final double sx;
 		private final double sy;
-		private double dx = 0;
-		private double dy = 0;
 
 		public LayerShift(Layer layer, double sx, double sy) {
 			this.layer = layer;
@@ -138,11 +136,7 @@ public class LayerManager {
 		}
 
 		private void move(double x, double y) {
-			dx += x * sx;
-			dy += y * sy;
-			layer.move((int)dx, (int)dy);
-			dx -= (int)dx;
-			dy -= (int)dy;
+			layer.move(x * sx, y * sy);
 		}
 	}
 }
