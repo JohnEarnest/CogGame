@@ -131,7 +131,7 @@ public class Sprite extends Layer {
 	* @param s the Sprite to check intersection with
 	**/
 	public boolean collidesWith(Sprite s) {
-		return collidesWidth(s.getX(), s.getY(), s.getWidth(), s.getHeight());
+		return collidesWith(s.getX(), s.getY(), s.getWidth(), s.getHeight());
 	}
 
 	/**
@@ -148,7 +148,7 @@ public class Sprite extends Layer {
 		for(int x = -1; x <= 1; x++) {
 			for(int y = -1; y <= 1; y++) {
 				if (t.getCell(x + tx, y + ty) == 0) { continue; }
-				if (collidesWidth(	(x + tx) * t.getCellWidth(),
+				if (collidesWith(	(x + tx) * t.getCellWidth(),
 									(y + ty) * t.getCellHeight(),
 									t.getCellWidth(),
 									t.getCellHeight())) { return true; }
