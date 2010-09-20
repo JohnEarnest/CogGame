@@ -119,20 +119,15 @@ public class ImageTool {
 	**/
 	public static boolean hasTransparency(Image i, int tileWidth, int tileHeight, int tile) {
 		final int w = i.getWidth(null);
-		final int h = i.getHeight(null);
-		final int a[] = new int[w * h];
-		final PixelGrabber pg = new PixelGrabber(i,0,0,w,h,a,0,w);
+		final int a[] = new int[tileWidth * tileHeight];
+		final int tx = (tile % (w / tileWidth)) * tileWidth;
+		final int ty = (tile / (w / tileWidth)) * tileHeight;
+		final PixelGrabber pg = new PixelGrabber(i,tx,ty,tx+tileWidth,ty+tileHeight,a,0,w);
 		try { pg.grabPixels(); }
 		catch(InterruptedException ie) { ie.printStackTrace(); }
 
-		final int tx = (tile % (w / tileWidth)) * tileWidth;
-		final int ty = (tile / (w / tileWidth)) * tileHeight;
-		for(int x = tx; x < tx + tileWidth; x++) {
-			for(int y = ty; y < ty + tileHeight; y++) {
-				if ((a[x + (y * w)] & 0xFF000000) != 0xFF000000) {
-					return true;
-				}
-			}
+		for(int x : a) {
+			if ((x & 0xFF000000) != 0xFF000000) { return true; }
 		}
 		return false;
 	}
