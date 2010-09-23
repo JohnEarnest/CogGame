@@ -2,11 +2,16 @@ package coggame;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Toolkit;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.PixelGrabber;
+import java.awt.image.RenderedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
+import javax.imageio.ImageIO;
 
 /**
 * The ImageTool is a collection of utility
@@ -130,5 +135,48 @@ public class ImageTool {
 			if ((x & 0xFF000000) != 0xFF000000) { return true; }
 		}
 		return false;
+	}
+
+
+	/**
+	* A convenience method for loading image files
+	* from this application's JAR. Blocks until the
+	* image is fully loaded.
+	*
+	* @param filename the filename of the image resource
+	**/
+	public static Image loadImage(String filename) {
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		ClassLoader loader = ImageTool.class.getClassLoader();
+		Image ret = toolkit.getImage(loader.getResource(filename));
+		while (ret.getWidth(null) < 0) {
+			try {Thread.sleep(10);}
+			catch(InterruptedException ie) {}
+		}
+		return ret;
+	}
+
+	/**
+	* A convenience method for saving images to
+	* the local filesystem. File extensions are inferred
+	* from the filename (.gif, .png, .jpg, .bmp), and
+	* .png is used as a default if the extension is
+	* unrecognized or absent.
+	* Returns false if the image did not save successfully.
+	**/
+	public static boolean saveImage(RenderedImage image, String filename) {
+		String extension;
+		if		(filename.toUpperCase().endsWith(".GIF")) { extension = "gif"; }
+		else if	(filename.toUpperCase().endsWith(".JPG")) { extension = "jpg"; }
+		else if	(filename.toUpperCase().endsWith(".JPEG")) { extension = "jpeg"; }
+		else if (filename.toUpperCase().endsWith(".BMP")) { extension = "bmp"; }
+		else if (filename.toUpperCase().endsWith(".PNG")) { extension = "png"; }
+		else	{ extension = "png"; filename += "." + extension; }
+
+		try {
+			ImageIO.write(image, extension, new File(filename));
+		}
+		catch(IOException ioe) { return false; }
+		return true;
 	}
 }

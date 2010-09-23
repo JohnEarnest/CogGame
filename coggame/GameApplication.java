@@ -213,24 +213,6 @@ public abstract class GameApplication {
 	**/
 	public abstract void tick(double time);
 
-	/**
-	* A convenience method for loading image files
-	* from this application's JAR. Blocks until the
-	* image is fully loaded.
-	*
-	* @param filename the filename of the image resource
-	**/
-	public static Image loadImage(String filename) {
-		Toolkit toolkit = Toolkit.getDefaultToolkit();
-		ClassLoader loader = GameApplication.class.getClassLoader();
-		Image ret = toolkit.getImage(loader.getResource(filename));
-		while (ret.getWidth(null) < 0) {
-			try {Thread.sleep(10);}
-			catch(InterruptedException ie) {}
-		}
-		return ret;
-	}
-
 	private class InnerListener implements KeyListener {
 		private final GameApplication app;
 
