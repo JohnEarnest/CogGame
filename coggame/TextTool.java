@@ -69,6 +69,44 @@ public class TextTool {
 	}
 
 	/**
+	* Draw a rectangular region of characters
+	* using given border tiles:
+	* <pre>
+	* 0 1 2
+	* 3 4 5
+	* 6 7 8
+	* </pre>
+	*
+	* @param g the destination Graphics surface
+	* @param x the x-offset of the top-left corner of the box
+	* @param y the y-offset of the top-left corner of the box
+	* @param w the width in characters of the interior of the box
+	* @param h the height in characters of the interior of the box
+	* @param t an array of character indices for the border and fill
+	**/
+	private void drawBox(int x, int y, int w, int h, char[] t, Graphics g) {
+		final int nedge = y;
+    	final int sedge = y + h + 1;
+    	final int wedge = x;
+    	final int eedge = x + w + 1;
+    	drawChar(t[0], wedge, nedge, g);
+    	drawChar(t[2], eedge, nedge, g);
+    	drawChar(t[6], wedge, sedge, g);
+    	drawChar(t[8], eedge, sedge, g);
+		for (int z = 1; z <= h; z++) {
+			drawChar(t[3], wedge, y+z, g);
+			drawChar(t[5], eedge, y+z, g);
+		}
+		for (int z = 1; z <= w; z++) {
+			drawChar(t[1], x+z, nedge, g);
+			drawChar(t[7], x+z, sedge, g);
+			for (int a=1;a<=h;a++) {
+				drawChar(t[4], x+z, y+a, g);
+			}
+		}
+	}
+
+	/**
 	* Split a string into a series of lines no longer
 	* than a specified width by breaking on spaces between words.
 	* Useful for word-wrapped dialog boxes, etc.
