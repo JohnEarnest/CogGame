@@ -3,6 +3,7 @@ package coggame;
 import java.awt.Graphics;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
 * The LayerManager is specialized collection
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 *
 * @author John Earnest
 **/
-public class LayerManager {
+public class LayerManager implements Iterable<Layer> {
 	
 	private List<LayerShift> layers = new ArrayList<LayerShift>();
 
@@ -122,6 +123,28 @@ public class LayerManager {
 		for(LayerShift shift : layers) {
 			shift.move(dx, dy);
 		}
+	}
+
+	/**
+	* Exposes an iterator over the underlying layer
+	* collection, making it easy to perform aggregate
+	* operations.
+	**/
+	public Iterator<Layer> iterator() {
+		return new LayerIterator(layers);
+	}
+
+	private class LayerIterator implements Iterator<Layer> {
+		private int index = 0;
+		private final List<LayerShift> layers;
+
+		public LayerIterator(List<LayerShift> layers) {
+			this.layers = layers;
+		}
+
+		public void remove()		{ throw new UnsupportedOperationException(); }
+		public boolean hasNext()	{ return index < layers.size(); }
+		public Layer next()			{ return layers.get(index++).layer; }
 	}
 
 	private class LayerShift {

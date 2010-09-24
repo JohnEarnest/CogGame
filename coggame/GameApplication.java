@@ -148,6 +148,16 @@ public abstract class GameApplication {
 	public JFrame getWindow() { return frame; }
 
 	/**
+	* Return the width of the application in pixels before scaling.
+	**/
+	public int getWidth() { return buffer.getWidth(null); }
+
+	/**
+	* Return the height of the application in pixels before scaling.
+	**/
+	public int getHeight() { return buffer.getHeight(null); }
+
+	/**
 	* Return a bitvector containing status bits
 	* corresponding to the static key constants.
 	*
