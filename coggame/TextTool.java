@@ -19,27 +19,33 @@ public class TextTool {
 	private final int charWidth;
 	private final int charHeight;
 	private final int sheetWidth;
+	private final boolean tileCoords;
 
 	/**
-	* Construct a new TextTool
+	* Construct a new TextTool.
+	* If tileCoords is true, units given as x and y coordinates
+	* for drawChar(), drawString() and drawBox() will be interpreted
+	* as character units. Otherwise, these units will be interpreted as pixels.
 	*
 	* @param font the character grid
 	* @param charWidth the width of a character in pixels
 	* @param charHeight the width of a character in pixels
+	* @param tileCoords select drawing units
 	**/
-	public TextTool(Image font, int charWidth, int charHeight) {
+	public TextTool(Image font, int charWidth, int charHeight, boolean tileCoords) {
 		this.font = font;
 		this.charWidth = charWidth;
 		this.charHeight = charHeight;
 		sheetWidth = font.getWidth(null) / charWidth;
+		this.tileCoords = tileCoords;
 	}
 
 	/**
 	* Draw a single character
 	*
 	* @param c the character to draw
-	* @param x the x-offset in tiles at which to draw the character
-	* @param y the y-offset in tiles at which to draw the character
+	* @param x the x-offset at which to draw the character
+	* @param y the y-offset at which to draw the character
 	* @param g the destination Graphics surface
 	**/
 	public void drawChar(char c, int x, int y, Graphics g) {
@@ -47,8 +53,8 @@ public class TextTool {
 		
 		final int tx = ((c - ' ') % sheetWidth) * charWidth;
 		final int ty = ((c - ' ') / sheetWidth) * charHeight;
-		final int dx = x * charWidth;
-		final int dy = y * charHeight;
+		final int dx = (tileCoords) ? (x * charWidth) : x;
+		final int dy = (tileCoords) ? (y * charHeight) : y;
 		g.drawImage( font,
 						dx, dy, dx + charWidth, dy + charHeight,
 						tx, ty, tx + charWidth, ty + charHeight, null);
@@ -58,13 +64,14 @@ public class TextTool {
 	* Draw an entire string
 	*
 	* @param text the string to draw
-	* @param x the x-offset in tiles at which to draw the character
-	* @param y the y-offset in tiles at which to draw the character
+	* @param x the x-offset at which to draw the character
+	* @param y the y-offset at which to draw the character
 	* @param g the destination Graphics surface
 	**/
 	public void drawString(String text, int x, int y, Graphics g) {
 		for(char c : text.toCharArray()) {
-			drawChar(c, x++, y, g);
+			drawChar(c, x, y, g);
+			x += (tileCoords) ? 1 : charWidth;
 		}
 	}
 
@@ -84,24 +91,26 @@ public class TextTool {
 	* @param h the height in characters of the interior of the box
 	* @param t an array of character indices for the border and fill
 	**/
-	private void drawBox(int x, int y, int w, int h, char[] t, Graphics g) {
+	public void drawBox(int x, int y, int w, int h, char[] t, Graphics g) {
+		final int hscale = (tileCoords) ? 1 : charWidth;
+		final int vscale = (tileCoords) ? 1 : charHeight;
 		final int nedge = y;
-    	final int sedge = y + h + 1;
+    	final int sedge = y + (vscale * (h + 1));
     	final int wedge = x;
-    	final int eedge = x + w + 1;
-    	drawChar(t[0], wedge, nedge, g);
+    	final int eedge = x + (hscale * (w + 1));
+		drawChar(t[0], wedge, nedge, g);
     	drawChar(t[2], eedge, nedge, g);
     	drawChar(t[6], wedge, sedge, g);
     	drawChar(t[8], eedge, sedge, g);
 		for (int z = 1; z <= h; z++) {
-			drawChar(t[3], wedge, y+z, g);
-			drawChar(t[5], eedge, y+z, g);
+			drawChar(t[3], wedge, y + (vscale * z), g);
+			drawChar(t[5], eedge, y + (vscale * z), g);
 		}
 		for (int z = 1; z <= w; z++) {
-			drawChar(t[1], x+z, nedge, g);
-			drawChar(t[7], x+z, sedge, g);
-			for (int a=1;a<=h;a++) {
-				drawChar(t[4], x+z, y+a, g);
+			drawChar(t[1], x + (hscale * z), nedge, g);
+			drawChar(t[7], x + (hscale * z), sedge, g);
+			for (int a = 1; a <= h; a++) {
+				drawChar(t[4], x + (hscale * z), y + (vscale * a), g);
 			}
 		}
 	}
