@@ -236,7 +236,7 @@ public class TiledLayer extends Layer {
 	* deals with TiledLayers.
 	*
 	* Returns a sequence of pairs of coordinates representing
-	* absolute tile positions. If no path is found, returns null.
+	* relative tile positions. If no path is found, returns null.
 	*
 	* @param layer the TiledLayer to search
 	* @param xStart the x-position of the starting tile
