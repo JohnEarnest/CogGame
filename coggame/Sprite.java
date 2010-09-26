@@ -2,6 +2,7 @@ package coggame;
 
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Rectangle;
 
 /**
 * Sprites are Layers designed to
@@ -25,10 +26,7 @@ public class Sprite extends Layer {
 
 	private int transform = TRANS_NONE;
 	private int frame = 1;
-	private int collisionX = 0;
-	private int collisionY = 0;
-	private int collisionWidth;
-	private int collisionHeight;
+	private Rectangle collision;
 
 	/**
 	* Construct a new non-animated Sprite.
@@ -51,8 +49,7 @@ public class Sprite extends Layer {
 		frames = image;
 		this.frameWidth = frameWidth;
 		this.frameHeight = frameHeight;
-		collisionWidth = frameWidth;
-		collisionHeight = frameHeight;
+		collision = new Rectangle(0, 0, frameWidth, frameHeight);
 		sheetWidth = image.getWidth(null) / frameWidth;
 	}
 
@@ -89,6 +86,27 @@ public class Sprite extends Layer {
 	**/
 	public void setTransform(int transform) {
 		this.transform = transform;
+	}
+
+	/**
+	* Return a Rectangle representing the bounding
+	* box used for collision, relative to the upper-left
+	* corner of the sprite. By default, this bounding box
+	* is initialized to match the size of an animation frame.
+	**/
+	public Rectangle getCollisionBox() {
+		return collision;
+	}
+
+	/**
+	* Set the bounding box used for collision detection. 
+	* The rectangle specified will be treated as relative
+	* to the upper-left corner of the sprite.
+	*
+	* @param collision the new bounding box
+	**/
+	public void setCollisionBox(Rectangle collision) {
+		this.collision = collision;
 	}
 
 	/**
@@ -131,7 +149,8 @@ public class Sprite extends Layer {
 	* @param s the Sprite to check intersection with
 	**/
 	public boolean collidesWith(Sprite s) {
-		return collidesWith(s.getX(), s.getY(), s.getWidth(), s.getHeight());
+		Rectangle c = s.getCollisionBox();
+		return collidesWith(c.x + s.getX(), c.y + s.getY(), c.width, c.height);
 	}
 
 	/**
@@ -147,7 +166,9 @@ public class Sprite extends Layer {
 
 		for(int x = -1; x <= 1; x++) {
 			for(int y = -1; y <= 1; y++) {
-				if (t.getCell(x + tx, y + ty) == 0) { continue; }
+				if (x + tx < 0 || x + tx >= t.getColumns()) { continue; }
+				if (y + ty < 0 || y + ty >= t.getRows())	{ continue; }
+				if (t.getCell(x + tx, y + ty) == 0)			{ continue; }
 				if (collidesWith(	(x + tx) * t.getCellWidth(),
 									(y + ty) * t.getCellHeight(),
 									t.getCellWidth(),
@@ -157,11 +178,20 @@ public class Sprite extends Layer {
 		return false;
 	}
 
-	private boolean collidesWith(int x, int y, int w, int h) {
-		if (getY() + getHeight() < y )	{ return false; }
-		if ( y + h < getY() )			{ return false; }
-		if (getX() + getWidth()	<  x )	{ return false; }
-		if ( x + w < getX() )			{ return false; }
+	/**
+	* Returns true if the collision box of this
+	* Sprite intersects with the rectangular region specified.
+	*
+	* @param x the x-offset in pixels of the upper-left corner of the region
+	* @param y the y-offset in pixels of the upper-left corner of the region
+	* @param w the width in pixels of the region
+	* @param h the height in pixels of the region
+	**/
+	public boolean collidesWith(int x, int y, int w, int h) {
+		if (getY() + collision.y + collision.height < y    )	{ return false; }
+		if (getY() + collision.y					> y + h)	{ return false; }
+		if (getX() + collision.x + collision.width	< x    )	{ return false; }
+		if (getX() + collision.x					> x + w)	{ return false; }
 		return true;
 	}
 }
