@@ -2,6 +2,7 @@ package coggame;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -109,34 +110,80 @@ public class ImageTool {
 	* @param i the source image
 	**/
 	public static boolean hasTransparency(Image i) {
-		return hasTransparency(i, i.getWidth(null), i.getHeight(null), 0);
+		return hasTransparency(i, i.getWidth(null), i.getHeight(null), 1);
+	}
+
+	private static int[] getTile(Image i, int tileWidth, int tileHeight, int tile) {
+		final int w = i.getWidth(null);
+		final int ret[] = new int[tileWidth * tileHeight];
+		final int tx = ((tile - 1) % (w / tileWidth)) * tileWidth;
+		final int ty = ((tile - 1) / (w / tileWidth)) * tileHeight;
+		final PixelGrabber pg = new PixelGrabber(i,tx,ty,tx+tileWidth,ty+tileHeight,ret,0,w);
+		try { pg.grabPixels(); }
+		catch(InterruptedException ie) { ie.printStackTrace(); }
+		return ret;
 	}
 
 	/**
-	* Returns true if a given 0-indexed tile within
+	* Returns true if a given 1-indexed tile within
 	* the supplied image has any pixels that are not
 	* completely opaque.
 	*
 	* @param i the source image
 	* @param tileWidth the width of a tile in pixels
 	* @param tileHeight the height of a tile in pixels
-	* @param tile the index of the tile to examine
+	* @param tile the 1-based index of the tile to examine
 	**/
 	public static boolean hasTransparency(Image i, int tileWidth, int tileHeight, int tile) {
-		final int w = i.getWidth(null);
-		final int a[] = new int[tileWidth * tileHeight];
-		final int tx = (tile % (w / tileWidth)) * tileWidth;
-		final int ty = (tile / (w / tileWidth)) * tileHeight;
-		final PixelGrabber pg = new PixelGrabber(i,tx,ty,tx+tileWidth,ty+tileHeight,a,0,w);
-		try { pg.grabPixels(); }
-		catch(InterruptedException ie) { ie.printStackTrace(); }
-
+		final int[] a = getTile(i, tileWidth, tileHeight, tile);
 		for(int x : a) {
 			if ((x & 0xFF000000) != 0xFF000000) { return true; }
 		}
 		return false;
 	}
 
+	/**
+	* Return a Rectangle with a position relative to
+	* the upper-left corner of an image whose edges align with
+	* the boundaries of non-transparent pixels within the image.
+	*
+	* @param i the source image
+	**/
+	public static Rectangle tightBound(Image i) {
+		return tightBound(i, i.getWidth(null), i.getHeight(null), 1);
+	}
+
+	/**
+	* Return a Rectangle with a position relative to
+	* the upper-left corner of a tile whose edges align with
+	* the boundaries of non-transparent pixels within the tile.
+	* This is mainly intended for producing collision boxes for
+	* animated sprites, in which the "solid" region of an object
+	* may vary from frame to frame.
+	*
+	* @param i the source image
+	* @param tileWidth the width of a tile in pixels
+	* @param tileHeight the height of a tile in pixels
+	* @param tile the 1-based index of the tile to examine
+	**/
+	public static Rectangle tightBound(Image i, int tileWidth, int tileHeight, int tile) {
+		final int[] a = getTile(i, tileWidth, tileHeight, tile);
+		int x = tileWidth;
+		int y = tileHeight;
+		int w = 0;
+		int h = 0;
+		for(int z = 0; z < a.length; z++) {
+			if ((a[z] & 0xFF000000) != 0xFF000000) { continue; }
+
+			int px = z % tileWidth;
+			int py = z / tileWidth;
+			if (px < x)		{ x = px; }
+			if (py < y)		{ y = py; }
+			if (px - x > w) { w = px - x; }
+			if (py - y > h) { h = py - y; }
+		}
+		return new Rectangle(x, y, w, h);
+	}
 
 	/**
 	* A convenience method for loading image files
