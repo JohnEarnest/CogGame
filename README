@@ -4,4 +4,16 @@ should look like.
 
 Much more documentation and some example code to come.
 
+For reference, if you want to generate the docs just run:
+
+	ant
+
+If you're working on your own code using coggame, drop the jar in your operating system's java extensions folder or put the coggame jar in your source directory and compile like so:
+
+	javac -classpath coggame.jar YourClass.java
+
+To run it, use the following:
+
+	java -classpath coggame.jar:. YourClass
+
 -Rodge

@@ -1,0 +1,50 @@
+<project name="coggame" default="clean-all">
+
+	<property name="build" value="build" />
+	<property name="src" value="src" />
+	<property name="doc" value="doc" />
+	<property name="dist" value="dist" />
+
+	<path id="build.classpath">
+		<pathelement path="${build}" />
+	</path>
+
+	<target name="clean">
+		<delete dir="build" />
+		<delete dir="doc" />
+		<delete dir="dist" />
+	</target>
+
+	<target name="makedirs" depends="clean">
+		<mkdir dir="${build}" />
+		<mkdir dir="${build}/assets" />
+		<mkdir dir="${dist}" />
+		<mkdir dir="${doc}" />
+		<mkdir dir="${doc}/javadoc" />
+		<copy todir="${build}/assets" >
+			<fileset dir="${src}/assets" />
+		</copy>
+	</target>
+
+	<target name="compile-all" depends="makedirs">
+		<javac srcdir="${src}" destdir="${build}" />
+	</target>
+
+	<target name="build-jar" depends="compile-all" >
+		<jar destfile="${dist}/coggame.jar"
+			basedir="${build}"
+			excludes="*.class,assets/"
+		/>
+	</target>
+
+	<target name="makedocs" depends="compile-all">
+		<javadoc destdir="${doc}/javadoc" packagenames="coggame.*" sourcepath="${src}" />
+	</target>
+
+	<target name="clean-all" depends="makedocs, build-jar">
+	</target>
+
+	<target name="all" depends="makedocs">
+	</target>
+
+</project>
