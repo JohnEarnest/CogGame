@@ -191,10 +191,10 @@ public class Sprite extends Layer {
 	* @param h the height in pixels of the region
 	**/
 	public boolean collidesWith(int x, int y, int w, int h) {
-		if (getY() + collision.y + collision.height < y    )	{ return false; }
-		if (getY() + collision.y					> y + h)	{ return false; }
-		if (getX() + collision.x + collision.width	< x    )	{ return false; }
-		if (getX() + collision.x					> x + w)	{ return false; }
+		if (getY() + collision.y + collision.height <  y    )	{ return false; }
+		if (getY() + collision.y					>= y + h)	{ return false; }
+		if (getX() + collision.x + collision.width	<  x    )	{ return false; }
+		if (getX() + collision.x					>= x + w)	{ return false; }
 		return true;
 	}
 }
