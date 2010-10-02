@@ -164,8 +164,11 @@ public class Sprite extends Layer {
 		int tx = (getX() - t.getX()) / t.getCellWidth();
 		int ty = (getY() - t.getY()) / t.getCellHeight();
 
-		for(int x = -1; x <= 1; x++) {
-			for(int y = -1; y <= 1; y++) {
+		int range = Math.max(	(collision.width / t.getCellWidth()) + 1,
+								(collision.height / t.getCellHeight()) + 1);
+
+		for(int x = -range; x <= range; x++) {
+			for(int y = -range; y <= range; y++) {
 				if (x + tx < 0 || x + tx >= t.getColumns()) { continue; }
 				if (y + ty < 0 || y + ty >= t.getRows())	{ continue; }
 				if (t.getCell(x + tx, y + ty) == 0)			{ continue; }
