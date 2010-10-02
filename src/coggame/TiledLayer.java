@@ -106,6 +106,24 @@ public class TiledLayer extends Layer {
 	}
 
 	/**
+	* Fill a rectangular region of cells with randomly
+	* chosen tiles from a provided array.
+	*
+	* @param col the 0-indexed column number of the cell
+	* @param row the 0-indexed row number of the cell
+	* @param numCols the number of columns to fill
+	* @param numRows the number of rows to fill
+	* @param tiles an array of tile indices to fill the region with
+	**/
+	public void fillCells(int col, int row, int numCols, int numRows, int[] tiles) {
+		for(int x = 0; x < numCols; x++) {
+			for(int y = 0; y < numRows; y++) {
+				cells[col + x][row + y] = tiles[(int)(Math.random() * tiles.length)];
+			}
+		}
+	}
+
+	/**
 	* Draw this TiledLayer.
 	*
 	* @param g the destination Graphics object
