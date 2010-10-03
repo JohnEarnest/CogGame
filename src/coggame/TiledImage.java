@@ -3,6 +3,7 @@ package coggame;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 
 /**
 * TiledImage is a Layer that loops an Image
@@ -33,6 +34,22 @@ public class TiledImage extends Layer {
 		this.clip = clip;
 	}
 
+	/**
+	* Create a new TiledImage by rendering a static snapshot of a layer.
+	*
+	* @param layer the source layer
+	* @param wrapHorizontal should this image be tiled horizontally?
+	* @param wrapVertical should this image be tiled vertically?
+	* @param clip a Rectangle defining the drawing region
+	**/
+	public TiledImage(Layer layer, boolean wrapHorizontal, boolean wrapVertical, Rectangle clip) {
+		image = new BufferedImage(layer.getWidth(), layer.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		layer.paint(image.getGraphics());
+		this.wrapVertical = wrapVertical;
+		this.wrapHorizontal = wrapHorizontal;
+		this.clip = clip;
+	}
+	
 	/**
 	* Returns the width of the source image in pixels.
 	**/
