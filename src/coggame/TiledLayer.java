@@ -83,9 +83,22 @@ public class TiledLayer extends Layer {
 	*
 	* @param col the 0-indexed column number of the cell
 	* @param row the 0-indexed row number of the cell
+	* @param tile the 1-indexed tile to set (0 is transparent)
 	**/
 	public void setCell(int col, int row, int tile) {
 		cells[col][row] = tile;
+	}
+
+	/**
+	* Sets the tile index at a given position with
+	* a randomly chosen tile from a provided array.
+	*
+	* @param col the 0-indexed column number of the cell
+	* @param row the 0-indexed row number of the cell
+	* @param tiles an array of possible tiles to set
+	**/
+	public void setCell(int col, int row, int[] tiles) {
+		cells[col][row] = tiles[(int)(Math.random() * tiles.length)];
 	}
 
 	/**
@@ -190,10 +203,6 @@ public class TiledLayer extends Layer {
 		return (grid.getCell(x, y) == testval);
 	}
 
-	private static int rand(int[] src) {
-		return src[(int)(Math.random() * src.length)];
-	}
-
 	/**
 	* Fill a provided TiledLayer with a procedurally
 	* generated skyline. Tiles are randomly selected
@@ -220,11 +229,9 @@ public class TiledLayer extends Layer {
 			width = Math.min(width, col);
 			col -= width;
 
-			//layer.fillCells(col, height, width, layer.getRows() - height - 1, SKY_SOLID);
-
 			for(int x = 0; x <= width; x++) {
 				for(int y = 0; y < layer.getRows() - height; y++) {
-					layer.setCell(x + col, y + height, rand(fill));
+					layer.setCell(x + col, y + height, fill);
 				}
 			}
 		} while (col > 0);
@@ -232,16 +239,16 @@ public class TiledLayer extends Layer {
 		// add edge decorations
 		for(int x = layer.getColumns() - 1; x >= 0; x--) {
 			for(int y = layer.getRows() - 1; y >= 0; y--) {
-				
+
 				if (relEquals(x, y - 1, layer, 0)) {
-					layer.setCell(x, y - 1, rand(top));
+					layer.setCell(x, y - 1, top);
 					break;
 				}
 				else if (relEquals(x + 1, y, layer, 0)) {
-					layer.setCell(x, y, rand(right));
+					layer.setCell(x, y, right);
 				}
 				else if (relEquals(x - 1, y, layer, 0)) {
-					layer.setCell(x, y, rand(right));
+					layer.setCell(x, y, left);
 				}
 			}
 		}
