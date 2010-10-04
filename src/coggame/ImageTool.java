@@ -118,7 +118,7 @@ public class ImageTool {
 		final int ret[] = new int[tileWidth * tileHeight];
 		final int tx = ((tile - 1) % (w / tileWidth)) * tileWidth;
 		final int ty = ((tile - 1) / (w / tileWidth)) * tileHeight;
-		final PixelGrabber pg = new PixelGrabber(i,tx,ty,tx+tileWidth,ty+tileHeight,ret,0,w);
+		final PixelGrabber pg = new PixelGrabber(i,tx,ty,tileWidth,tileHeight,ret,0,tileWidth);
 		try { pg.grabPixels(); }
 		catch(InterruptedException ie) { ie.printStackTrace(); }
 		return ret;
