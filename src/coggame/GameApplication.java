@@ -270,7 +270,7 @@ public abstract class GameApplication {
 			while(running) {
 				repaint();
 				try {Thread.sleep(100);}
-				catch(InterruptedException ie) {}
+				catch(InterruptedException ie) { ie.printStackTrace(); }
 			}
 		}
 
@@ -313,7 +313,7 @@ public abstract class GameApplication {
 				parent.join();
 			}
 			catch(InterruptedException ie) { ie.printStackTrace(); }
-			while(running) {
+			while(true) {
 				long thisTick = System.nanoTime();
 				double tickTime = ((double)( (thisTick - lastTick) / 1000000)) / 1024;
 				lastTick = thisTick;
@@ -323,7 +323,7 @@ public abstract class GameApplication {
 					app.paint(buffer.getGraphics());
 				}
 				try {Thread.sleep(100);}
-				catch(InterruptedException ie) {}
+				catch(InterruptedException ie) { ie.printStackTrace(); }
 			}
 		}
 
