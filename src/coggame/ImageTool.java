@@ -177,8 +177,8 @@ public class ImageTool {
 
 			int px = z % tileWidth;
 			int py = z / tileWidth;
-			if (px < x)		{ x = px; }
-			if (py < y)		{ y = py; }
+			if (px < x)		{ if (w > 0) { w += x - px; } x = px; }
+			if (py < y)		{ if (h > 0) { h += y - py; } y = py; }
 			if (px - x > w) { w = px - x; }
 			if (py - y > h) { h = py - y; }
 		}
