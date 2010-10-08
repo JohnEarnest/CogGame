@@ -39,11 +39,7 @@ public class ImageTool {
 		final Color[][] ret = new Color[w][h];
 		for(int x = 0; x < w; x++) {
 			for(int y = 0; y < h; y++) {
-				int c = a[x + (w * y)];
-				ret[x][y] = new Color(	(c >> 24) & 0xFF,
-										(c >> 16) & 0xFF,
-										(c >>  8) & 0xFF,
-										(c >>  0) & 0xFF );
+				ret[x][y] = new Color(a[x + (w * y)]);
 			}
 		}
 		return ret;
@@ -103,16 +99,6 @@ public class ImageTool {
 		return ret;
 	}
 
-	/**
-	* Returns true if the supplied image has
-	* any pixels that are not completely opaque.
-	*
-	* @param i the source image
-	**/
-	public static boolean hasTransparency(Image i) {
-		return hasTransparency(i, i.getWidth(null), i.getHeight(null), 1);
-	}
-
 	private static int[] getTile(Image i, int tileWidth, int tileHeight, int tile) {
 		final int w = i.getWidth(null);
 		final int ret[] = new int[tileWidth * tileHeight];
@@ -122,6 +108,16 @@ public class ImageTool {
 		try { pg.grabPixels(); }
 		catch(InterruptedException ie) { ie.printStackTrace(); }
 		return ret;
+	}
+
+	/**
+	* Returns true if the supplied image has
+	* any pixels that are not completely opaque.
+	*
+	* @param i the source image
+	**/
+	public static boolean hasTransparency(Image i) {
+		return hasTransparency(i, i.getWidth(null), i.getHeight(null), 1);
 	}
 
 	/**
