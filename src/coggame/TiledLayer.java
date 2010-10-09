@@ -191,10 +191,6 @@ public class TiledLayer extends Layer {
 		animatedTiles.set(-animatedTileIndex - 1, staticTileIndex);
 	}
 
-	private static final int SKY_WIDTH_MIN = 2;
-	private static final int SKY_WIDTH_MAX = 6;
-	private static final int SKY_HEIGHT_DELTA = 4;
-
 	private static boolean relEquals(int x, int y, TiledLayer grid, int testval) {
 		if (x < 0) {return false;}
 		if (y < 0) {return false;}
@@ -202,6 +198,10 @@ public class TiledLayer extends Layer {
 		if (y >= grid.getRows()) {return false;}
 		return (grid.getCell(x, y) == testval);
 	}
+
+	private static final int SKY_WIDTH_MIN = 2;
+	private static final int SKY_WIDTH_MAX = 6;
+	private static final int SKY_HEIGHT_DELTA = 4;
 
 	/**
 	* Fill a provided TiledLayer with a procedurally
@@ -251,6 +251,62 @@ public class TiledLayer extends Layer {
 					layer.setCell(x, y, left);
 				}
 			}
+		}
+	}
+
+	private static final int CLOUD_HEIGHT = 4;
+	private static final int CLOUD_DELTA = 3;
+	private static final int CLOUD_COUNT = 6;
+
+	/**
+	* Add a series of procedurally generated clouds to
+	* a TiledLayer. Tiles are randomly selected
+	* from the lists provided.
+	*
+	* @param layer the TiledLayer to fill
+	* @param leftend tiles for the leftmost end of a cloud
+	* @param rightend tiles for the rightmost end of a cloud
+	* @param left tiles for upper-left corners/clumps
+	* @param right tiles for upper-right corners/clumps
+	* @param fill tiles for the center of a cloud
+	**/
+	private static void clouds(TiledLayer layer, int[] leftend, int rightend[], int[] left, int[] right, int[] fill) {
+
+		for(int z = 0; z < CLOUD_COUNT; z++) {			
+			final int maxh = (int)Math.max(2, Math.random() * CLOUD_HEIGHT);
+			int x = (int)(Math.random() * layer.getColumns());
+			int y = (int)(Math.random() * (layer.getRows() - maxh - 1)) + maxh;
+			
+			if (layer.getCell(x, y) == 0) { layer.setCell(x, y, leftend); }
+			// build up
+			for(int h = 1; h <= maxh; h++) {
+				x = (x+1) % layer.getColumns();
+				if (layer.getCell(x, y-h) == 0) { layer.setCell(x, y-h, left); }
+				layer.fillCells(x, y-h+1, 1, h, fill);
+
+				for(int b = (int)(Math.random()*CLOUD_DELTA); b > 0; b--) {
+					x = (x+1) % layer.getColumns();
+					layer.fillCells(x, y-h, 1, h+1, fill);
+				}
+			}
+			// middle stretch
+			for(int b = (int)(Math.random()*CLOUD_DELTA) + 1; b > 0; b--) {
+				x = (x+1) % layer.getColumns();
+				layer.fillCells(x, y-maxh, 1, maxh + 1, fill);
+			}
+			// build down
+			for(int h = maxh; h >= 1; h--) {
+				x = (x+1) % layer.getColumns();
+				if (layer.getCell(x, y-h) == 0) { layer.setCell(x, y-h, right); }
+				layer.fillCells(x, y-h+1, 1, h, fill);
+
+				for(int b = (int)(Math.random()*CLOUD_DELTA); b > 0; b--) {
+					x = (x+1) % layer.getColumns();
+					layer.fillCells(x, y-h+1, 1, h, fill);
+				}
+			}
+			x = (x+1) % layer.getColumns();
+			if (layer.getCell(x, y) == 0) { layer.setCell(x, y, rightend); }
 		}
 	}
 
