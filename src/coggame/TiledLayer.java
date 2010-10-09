@@ -270,7 +270,7 @@ public class TiledLayer extends Layer {
 	* @param right tiles for upper-right corners/clumps
 	* @param fill tiles for the center of a cloud
 	**/
-	private static void clouds(TiledLayer layer, int[] leftend, int rightend[], int[] left, int[] right, int[] fill) {
+	public static void clouds(TiledLayer layer, int[] leftend, int rightend[], int[] left, int[] right, int[] fill) {
 
 		for(int z = 0; z < CLOUD_COUNT; z++) {			
 			final int maxh = (int)Math.max(2, Math.random() * CLOUD_HEIGHT);
