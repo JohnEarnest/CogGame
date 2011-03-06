@@ -27,7 +27,13 @@
 	</target>
 
 	<target name="compile-all" depends="makedirs">
-		<javac srcdir="${src}" destdir="${build}" debug="on" debuglevel="lines,vars,source" />
+		<javac	srcdir="${src}"
+				destdir="${build}"
+				debug="on"
+				debuglevel="lines,vars,source"
+				includeantruntime="false"
+				deprecation="on"
+		/>
 	</target>
 
 	<target name="build-jar" depends="compile-all" >

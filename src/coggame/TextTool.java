@@ -41,6 +41,16 @@ public class TextTool {
 	}
 
 	/**
+	* Return the width of a character in pixels.
+	**/
+	public int charWidth() { return charWidth; }
+
+	/**
+	* Return the height of a character in pixels.
+	**/
+	public int charHeight() { return charHeight; }
+
+	/**
 	* Draw a single character
 	*
 	* @param c the character to draw

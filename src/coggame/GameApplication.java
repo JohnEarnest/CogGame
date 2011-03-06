@@ -4,6 +4,9 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.event.KeyListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseEvent;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
@@ -66,6 +69,7 @@ public abstract class GameApplication {
 	private final JFrame frame = new JFrame();
 	private final InnerPainter panel = new InnerPainter(this);
 	private final InnerEventPump pump = new InnerEventPump(this, Thread.currentThread());
+	private final InnerListener listener;
 	private final Thread painterThread;
 	private final Thread pumpThread;
 	private final Image buffer;
@@ -94,14 +98,12 @@ public abstract class GameApplication {
 		buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
 		// hide mouse cursor
-		Toolkit toolbox = Toolkit.getDefaultToolkit();
-		Image cursorImage = new BufferedImage(32,32,BufferedImage.TYPE_INT_ARGB);
-		Cursor blankCursor = toolbox.createCustomCursor(cursorImage,new Point(0,0),"");
-		frame.setCursor(blankCursor);
+		showCursor(false);
 
 		// configure frame
 		panel.setPreferredSize(new Dimension(width * scaleFactor, height * scaleFactor));
-		frame.addKeyListener(new InnerListener(this));
+		listener = new InnerListener(this);
+		frame.addKeyListener(listener);
 		frame.setLayout(new BorderLayout());
 		frame.getContentPane().add(panel, BorderLayout.CENTER);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -146,6 +148,32 @@ public abstract class GameApplication {
 	* mess with it at your own peril.
 	**/
 	public JFrame getWindow() { return frame; }
+
+	/**
+	* Control the visibility of the mouse cursor.
+	* By default, it is made invisible.
+	*
+	* @param show should the cursor be shown?
+	**/
+	public void showCursor(boolean show) {
+		if (show) {
+			frame.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		}
+		else {
+			Toolkit toolbox = Toolkit.getDefaultToolkit();
+			Image cursorImage = new BufferedImage(32,32,BufferedImage.TYPE_INT_ARGB);
+			Cursor blankCursor = toolbox.createCustomCursor(cursorImage,new Point(0,0),"");
+			frame.setCursor(blankCursor);
+		}
+	}
+
+	/**
+	* Enable mouse events for this application.
+	**/
+	public void enableMouseEvents() {
+		frame.getContentPane().addMouseListener(listener);
+		frame.getContentPane().addMouseMotionListener(listener);
+	}
 
 	/**
 	* Return the width of the application in pixels before scaling.
@@ -210,6 +238,27 @@ public abstract class GameApplication {
 	protected void keyTyped(char c) {}
 
 	/**
+	* Called whenever the mouse is moved.
+	* Mouse events must be enabled first.
+	*
+	* @param x the x position of the mouse, in pixels
+	* @param y the y position of the mouse, in pixels
+	**/
+	protected void mouseMoved(int x, int y) {}
+
+	/**
+	* Called whenever the mouse is clicked.
+	* The button returned corresponds to the constants
+	* exposed in java.awt.event.MouseEvent.
+	* Mouse events must be enabled first.
+	*
+	* @param x the x position of the mouse, in pixels
+	* @param y the y position of the mouse, in pixels
+	* @param button the button or buttons depressed
+	**/
+	protected void mouseClicked(int x, int y, int button) {}
+
+	/**
 	* A game's rendering code should go here.
 	*
 	* @param g the destination Graphics surface.
@@ -223,7 +272,7 @@ public abstract class GameApplication {
 	**/
 	public abstract void tick(double time);
 
-	private class InnerListener implements KeyListener {
+	private class InnerListener implements KeyListener, MouseListener, MouseMotionListener {
 		private final GameApplication app;
 
 		public InnerListener(GameApplication app) {
@@ -256,6 +305,20 @@ public abstract class GameApplication {
 		public void keyTyped(KeyEvent ke) {
 			app.keyTyped(ke.getKeyChar());
 		}
+
+		public void mouseClicked(MouseEvent e) {
+			app.mouseClicked(e.getX(), e.getY(), e.getButton());
+		}
+
+		public void mouseMoved(MouseEvent e) {
+			app.mouseMoved(e.getX(), e.getY());
+		}
+
+		public void mouseEntered(MouseEvent e)  {}
+		public void mouseExited(MouseEvent e)   {}
+		public void mousePressed(MouseEvent e)  {}
+		public void mouseReleased(MouseEvent e) {}
+		public void mouseDragged(MouseEvent e)  {}
 	}
 
 	private class InnerPainter extends JPanel implements Runnable {
